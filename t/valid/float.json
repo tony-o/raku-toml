@@ -1,0 +1,6 @@
+{
+    "pi": 3.14e0,
+    "pospi": 3.14e0,
+    "negpi": -3.14e0,
+    "zero-intpart": 0.123e0
+}

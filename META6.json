@@ -1,0 +1,21 @@
+{
+  "name":          "TOML",
+  "auth":          "zef:tony-o",
+  "version":       "0",
+  "api":           "0",
+  "description":   "TOML 1.0.0 compliant Encoding/Decoding",
+  "perl":          "6.c",
+  "license":       "Artistic-2.0",
+  "meta-version":  "0",
+  "build-depends": [],
+  "depends":       [],
+  "test-depends":  ["JSON::Fast"],
+  "provides": {
+    "TOML": "lib/TOML.rakumod",
+    "TOML::Time": "lib/TOML/Time.rakumod",
+    "TOML::Grammar": "lib/TOML/Grammar.rakumod",
+    "TOML::Actions": "lib/TOML/Actions.rakumod"
+  },
+  "source-url": "https://github.com/tony-o/raku-toml.git",
+  "resources": []
+}
