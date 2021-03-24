@@ -17,7 +17,7 @@
     "TOML::Actions": "lib/TOML/Actions.rakumod"
   },
   "source-url": "https://github.com/tony-o/raku-toml.git",
-  "resources": []
+  "resources": [],
   "tags": ["config",
            "toml",
            "json",
