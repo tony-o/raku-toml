@@ -31,7 +31,7 @@ sub x-to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False, Int 
     my $out = "["; #this can never be the opening object
 
     for 0..^$obj.elems -> $i {
-      $out ~= to-toml($obj[$i]) ~ (",\n" ~ ' ' x $array-space if $i != $obj.elems - 1);
+      $out ~= x-to-toml($obj[$i]) ~ (",\n" ~ ' ' x $array-space if $i != $obj.elems - 1);
     }
     $out ~= "]"; #this can never be the opening object
     return $out;
@@ -82,28 +82,28 @@ sub x-to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False, Int 
   my $ptr;
   $in-array ||= @path && !$in-array;
   for @keys -> $key {
-    my $k = to-toml($key, :key);
+    my $k = x-to-toml($key, :key);
     if $obj{$key} ~~ Hash {
       #make nice tables
       my @ks = sort-keys($obj{$key});
       if @ks.elems == 1 && $obj{$key}{@ks[0]} ~~ Hash {
-        $out ~= to-toml($obj{$key}{@ks[0]}, path => (|@path, $k, to-toml(@ks[0])), :$in-array);
+        $out ~= x-to-toml($obj{$key}{@ks[0]}, path => (|@path, $k, x-to-toml(@ks[0])), :$in-array);
       } elsif @ks.elems == 0 {
         $out ~= sprintf("%s = \{\}\n", $in-array ?? $k !! (|@path, $k).join('.'));
       } else {
         for @ks -> $ks {
           if $obj{$key}{$ks} ~~ Hash {
-            $out ~= to-toml($obj{$key}{$ks}, path => (|(!$in-array ?? @path !! ()), $k, to-toml($ks)), :$in-array);
+            $out ~= x-to-toml($obj{$key}{$ks}, path => (|(!$in-array ?? @path !! ()), $k, x-to-toml($ks)), :$in-array);
           } elsif $obj{$key}{$ks} ~~ Array && $obj{$key}{$ks}.elems && $obj{$key}{$ks}[0] ~~ Hash {
             for |$obj{$key}{$ks} -> $ko {
-              $out ~= sprintf("[[%s]]\n", (|@path, $k, to-toml($ks, :key)).join('.'));
-              $out ~= to-toml($ko, path => (|(!$in-array ?? @path !! ()), $k, to-toml($ks, :key)), :in-array);
+              $out ~= sprintf("[[%s]]\n", (|@path, $k, x-to-toml($ks, :key)).join('.'));
+              $out ~= x-to-toml($ko, path => (|(!$in-array ?? @path !! ()), $k, x-to-toml($ks, :key)), :in-array);
             }
           } else {
-            my $k22 = (|(!$in-array ?? @path !! ()), $k, to-toml($ks, :key)).join('.');
+            my $k22 = (|(!$in-array ?? @path !! ()), $k, x-to-toml($ks, :key)).join('.');
             $out ~= $k22
                   ~ ' = '
-                  ~ to-toml($obj{$key}{$ks}, path => (|(!$in-array ?? @path !! ()), $k, to-toml($ks)), :$in-array, array-space => $k22.chars + 4)
+                  ~ x-to-toml($obj{$key}{$ks}, path => (|(!$in-array ?? @path !! ()), $k, x-to-toml($ks)), :$in-array, array-space => $k22.chars + 4)
                   ~ "\n";
           }
         }
@@ -112,10 +112,10 @@ sub x-to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False, Int 
       #make nice array tables
       for |$obj{$key} -> $k2 {
         $out ~= sprintf("[[%s]]\n", (|@path, $k).join('.'));
-        $out ~= to-toml($k2, path => (|@path, $k), :in-array);
+        $out ~= x-to-toml($k2, path => (|@path, $k), :in-array);
       }
     } else {
-      $out ~= "$k = " ~ to-toml($obj{$key}, path => (|(!$in-array ?? @path !! ()), $k), :$in-array, array-space => $k.chars + 4) ~ "\n";
+      $out ~= "$k = " ~ x-to-toml($obj{$key}, path => (|(!$in-array ?? @path !! ()), $k), :$in-array, array-space => $k.chars + 4) ~ "\n";
     }
   }
   $out;
