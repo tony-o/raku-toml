@@ -18,4 +18,9 @@
   },
   "source-url": "https://github.com/tony-o/raku-toml.git",
   "resources": []
+  "tags": ["config",
+           "toml",
+           "json",
+           "serializer",
+           "parser"]
 }
