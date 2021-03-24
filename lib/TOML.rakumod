@@ -20,7 +20,12 @@ sub sort-keys($obj) {
   });
 }
 
-sub to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False, Int :$array-space = 0) is export {
+sub to-toml($obj) is export {
+  die 'to-toml expects a hash, got: ' ~ $obj.WHAT.^name;
+  x-to-toml($obj);
+}
+
+sub x-to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False, Int :$array-space = 0) {
   if $obj ~~ Array {
     return "[]" if $obj.elems == 0;
     my $out = "["; #this can never be the opening object
