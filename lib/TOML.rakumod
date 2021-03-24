@@ -20,13 +20,13 @@ sub sort-keys($obj) {
   });
 }
 
-sub to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False) is export {
+sub to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False, Int :$array-space = 0) is export {
   if $obj ~~ Array {
     return "[]" if $obj.elems == 0;
     my $out = "["; #this can never be the opening object
 
     for 0..^$obj.elems -> $i {
-      $out ~= to-toml($obj[$i]) ~ (",\n" if $i != $obj.elems - 1);
+      $out ~= to-toml($obj[$i]) ~ (",\n" ~ ' ' x $array-space if $i != $obj.elems - 1);
     }
     $out ~= "]"; #this can never be the opening object
     return $out;
@@ -93,9 +93,10 @@ sub to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False) is exp
               $out ~= to-toml($ko, path => (|(!$in-array ?? @path !! ()), $k, to-toml($ks, :key)), :in-array);
             }
           } else {
-            $out ~= (|(!$in-array ?? @path !! ()), $k, to-toml($ks, :key)).join('.')
+            my $k22 = (|(!$in-array ?? @path !! ()), $k, to-toml($ks, :key)).join('.');
+            $out ~= $k22
                   ~ ' = '
-                  ~ to-toml($obj{$key}{$ks}, path => (|(!$in-array ?? @path !! ()), $k, to-toml($ks)), :$in-array)
+                  ~ to-toml($obj{$key}{$ks}, path => (|(!$in-array ?? @path !! ()), $k, to-toml($ks)), :$in-array, array-space => $k22.chars + 4)
                   ~ "\n";
           }
         }
@@ -107,7 +108,7 @@ sub to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False) is exp
         $out ~= to-toml($k2, path => (|@path, $k), :in-array);
       }
     } else {
-      $out ~= "$k = " ~ to-toml($obj{$key}, path => (|(!$in-array ?? @path !! ()), $k), :$in-array) ~ "\n";
+      $out ~= "$k = " ~ to-toml($obj{$key}, path => (|(!$in-array ?? @path !! ()), $k), :$in-array, array-space => $k.chars + 4) ~ "\n";
     }
   }
   $out;
