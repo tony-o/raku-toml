@@ -1,7 +1,7 @@
 {
   "name":          "TOML",
   "auth":          "zef:tony-o",
-  "version":       "0",
+  "version":       "1",
   "api":           "0",
   "description":   "TOML 1.0.0 compliant Encoding/Decoding",
   "perl":          "6.c",

@@ -68,6 +68,8 @@ sub to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False, Int :$
     return $obj.Str;
   } elsif $obj ~~ DateTime {
     return $obj.Str;
+  } elsif $obj.WHAT.^name eq 'Any' {
+    return '{}'; #https://github.com/toml-lang/toml/issues/30#issuecomment-14004686
   }
   die "Unknown type: {$obj.WHAT.^name}" if $obj !~~ Hash;
   my @keys = sort-keys($obj);
