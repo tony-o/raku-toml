@@ -21,7 +21,7 @@ sub sort-keys($obj) {
 }
 
 sub to-toml($obj) is export {
-  die 'to-toml expects a hash, got: ' ~ $obj.WHAT.^name;
+  die 'to-toml expects a hash, got: ' ~ $obj.WHAT.^name unless $obj ~~ Hash;
   x-to-toml($obj);
 }
 
