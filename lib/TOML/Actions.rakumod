@@ -7,12 +7,24 @@ method TOP($/) {
 
 method expression($/) {
   if $/<keyval> {
-    if $*PTR ~~ Array {
-      $*PTR.push({}) unless + $*PTR;
-      $*PTR[*-1]{$/<keyval>.made.key} = $/<keyval>.made.value;
+    my $ptr := $*PTR;
+    if $ptr ~~ Array {
+      $ptr.push({}) unless + $ptr;
+      $ptr := $ptr[*-1];
+    }
+    if $/<keyval>.made.key ~~ Hash {
+      # dotted keys .
+      my $kvp := $/<keyval>.made.key;
+      while $kvp{$kvp.keys.first}.keys {
+        $ptr{$kvp.keys.first} //= {};
+        $ptr := $ptr{$kvp.keys.first};
+        $kvp := $kvp{$kvp.keys.first};
+      }
+      die if $ptr{$kvp.keys.first}.defined;
+      $ptr{$kvp.keys.first} = $/<keyval>.made.value;
     } else {
-      die if $*PTR{$/<keyval>.made.key}.defined;
-      $*PTR{$/<keyval>.made.key} = $/<keyval>.made.value;
+      die if $ptr{$/<keyval>.made.key}.defined;
+      $ptr{$/<keyval>.made.key} = $/<keyval>.made.value;
     }
   }
 }
@@ -128,14 +140,16 @@ sub interpolate($x) {
 sub ml-basic-is-ws($l) { $l ~~ m/^ \s* $/; }
 sub ml-basic-is-esc($l) { $l ~~ m/ '\\' \s* $/; }
 method ml-basic-string($/) {
-  my @lines = ($<ml-basic-body>//'').Str.lines;
+  my @lines = ($<ml-basic-body>//'').split($?NL);
   my $str   = '';
   my $state = 0; # 0 = normal, 1 = trimming
+  my $idx   = 0;
   for @lines -> $l {
+    $idx++;
     if ml-basic-is-esc($l) {
-      my $x = $l.substr(0, $l.rindex('\\'));
-      $x .=trim-leading if $state == 1;
-      $str ~= $x;
+      my $x  = $l.substr(0, $l.rindex('\\'));
+      $x    .=trim-leading if $state == 1;
+      $str  ~= $x;
       $state = 1;
     } else {
       if $state == 1 && ml-basic-is-ws($l) {
@@ -144,8 +158,10 @@ method ml-basic-string($/) {
         #trim
         $str ~= $l.trim-leading;
         $state = 0;
+      } elsif $idx == 1 && $l.chars == 0 {
+        next;
       } else {
-        $str ~= $l;
+        $str ~= $l ~ ($idx == +@lines ?? '' !! $?NL);
       }
     }
   }
