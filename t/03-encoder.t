@@ -12,9 +12,9 @@ my ($pass, $expect, $toml, $out);
 
 for @files.sort -> $f {
   $expect = from-toml($f.slurp);
-  $out    = to-toml($expect);
-  $toml   = from-toml($out);
-  $pass   = ok(cmp($toml, $expect), $f);
+  $out    = try to-toml($expect);
+  $toml   = try from-toml($out);
+  $pass   = try { ok(cmp($toml, $expect), $f) } // False;
   unless $pass {
     say '===TOML';
     say $f.slurp;
