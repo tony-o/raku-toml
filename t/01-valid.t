@@ -2,9 +2,9 @@
 
 use TOML;
 use Test;
-use JSON::Fast;
 use lib 't/lib';
 use TOML::Test;
+sub from-json($text) { ::("Rakudo::Internals::JSON").from-json($text) }
 
 #gather toml files
 my @files = |@*ARGS.map(*.IO) // 't/valid'.IO.dir.grep: { $_.extension eq 'toml' };
@@ -19,9 +19,9 @@ for @files.sort -> $f {
     say '===TOML';
     say $f.slurp;
     say '===EXPECT';
-    dd $expect;
+    say to-json $expect, :sorted-keys;
     say '===GOT';
-    dd $toml;
+    say to-json $toml, :sorted-keys;
     die;
   }
 }

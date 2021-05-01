@@ -11,7 +11,8 @@ sub cmp($a, $b) is export {
     return $a == $b;
   } elsif $a ~~ Str {
     return $a eq $b;
-  } elsif $a ~~ Num|Int {
+  } elsif $a ~~ Num|Int|Rat {
+    warn "$a vs $b" if $a != $b; 
     return $a == $b;
   } elsif $a ~~ DateTime {
     return $a.Instant == $b.Instant;

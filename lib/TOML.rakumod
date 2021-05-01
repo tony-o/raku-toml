@@ -1,13 +1,12 @@
 unit module TOML;
 
-use TOML::Grammar;
-use TOML::Actions;
+use TOML::NQP;
 use TOML::Time;
 
 sub from-toml(Str $d, Bool :$test = False) is export {
   try {
     #CATCH { default { .say; } }
-    TOML::Grammar.parse($d, :actions(TOML::Actions)).made
+    parse-toml($d);
   } // Nil;
 }
 
@@ -67,7 +66,7 @@ sub x-to-toml($obj, :@path = (), :$key = False, :$in-array is copy = False, Int 
       }
     }
     return sprintf('%s%s%s', $q, @s.join(''), $q);
-  } elsif $obj ~~ Num {
+  } elsif $obj ~~ Num|Rat {
     return $obj.Str;
   } elsif $obj ~~ Int {
     return $obj.Str;
